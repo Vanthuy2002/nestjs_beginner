@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserDto } from './user.dto';
-import { plainToClass } from 'src/common/helper';
 import { UserRepository } from './user.repo';
+import { StoreServices } from '@app/store/store.services';
 
 export const fakeData: UserDto[] = [
   { id: 1, name: 'Thuy Nguyen', age: 21, sex: 'male' },
@@ -11,7 +11,8 @@ export const fakeData: UserDto[] = [
 @Injectable()
 export class UserServices {
   constructor(
-    @Inject('CUSTOM_PROVIDERS') private readonly userRepo: UserRepository
+    @Inject('CUSTOM_PROVIDERS') private readonly userRepo: UserRepository,
+    private readonly storeServices: StoreServices
   ) {}
 
   getAllUser(): UserDto[] {
@@ -26,10 +27,7 @@ export class UserServices {
   }
 
   createUser(body: UserDto): object {
-    body.createdAt = new Date();
-    body.updatedAt = new Date();
-    const finalUser = plainToClass<UserDto>(UserDto, body);
-    fakeData.push(finalUser);
+    this.storeServices.saveData(body);
     return { message: 'Create user successfully!!' };
   }
 }

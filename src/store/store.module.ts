@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { StoreServices } from './store.services';
 
 export interface storeConfig {
@@ -20,4 +20,18 @@ export interface storeConfig {
   ],
   exports: [StoreServices],
 })
-export class StoreModule {}
+export class StoreModule {
+  static forRoot(config: storeConfig): DynamicModule {
+    return {
+      module: StoreModule,
+      providers: [
+        StoreServices,
+        {
+          provide: 'STORE_CONFIG',
+          useValue: config,
+        },
+      ],
+      exports: [StoreServices],
+    };
+  }
+}

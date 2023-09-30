@@ -6,16 +6,23 @@ import {
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
-import { UserDto } from './user.dto';
+import { LoggerServices } from '@app/loggers';
 import { UserServices } from './user.service';
+import { UserDto } from './user.dto';
+import { SecurityServices } from '@app/security';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userServices: UserServices) {}
+  constructor(
+    private readonly userServices: UserServices,
+    private readonly logging: LoggerServices,
+    private readonly security: SecurityServices
+  ) {}
 
   @Get()
-  getAllUser(): UserDto[] {
-    return this.userServices.getAllUser();
+  getAllUser(): number {
+    return this.logging.logger();
+    // return this.userServices.getAllUser();
   }
 
   @Get(':id')

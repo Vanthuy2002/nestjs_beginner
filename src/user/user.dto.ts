@@ -10,3 +10,10 @@ export class UserDto {
   @Expose()
   age: number;
 }
+
+export interface IUser<T = void> {
+  message?: string;
+  user?: T;
+  totalPage?: number;
+  size?: number;
+}

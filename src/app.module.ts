@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity, UserModule } from './user';
 
 @Module({
   imports: [
@@ -10,10 +11,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: 'root',
       password: null,
       database: 'auth_nestjs',
-      entities: [],
+      entities: [UserEntity],
       synchronize: true,
       timezone: '+07:00',
     }),
+    UserModule,
   ],
 })
 export class AppModule {}

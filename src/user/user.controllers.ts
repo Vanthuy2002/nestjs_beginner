@@ -6,9 +6,11 @@ import {
   Patch,
   Get,
   ParseIntPipe,
+  Delete,
+  Query,
 } from '@nestjs/common';
 import UserServices from './user.services';
-import { IUser, UserDto } from './user.dto';
+import { IUser, IUserParams, UserDto } from './user.dto';
 import { UserEntity } from './user.entity';
 import { logger } from '@app/utils/helpers';
 
@@ -17,19 +19,18 @@ export default class UserController {
   constructor(private readonly services: UserServices) {}
 
   @Get()
-  async getAllUsers() {
+  async getAllUsers(@Query() params: IUserParams) {
+    const { page = 1, limit = 5, search = '' } = params;
     try {
-      const { message, users, totalUser } = await this.services.findAll();
-      return { message, totalUser, users };
+      const info = await this.services.findAll({ page, limit, search });
+      return { ...info };
     } catch (err) {
       logger(err);
     }
   }
 
   @Get(':id')
-  async getUserById(
-    @Param('id', ParseIntPipe) id: number
-  ): Promise<UserEntity> {
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
     try {
       const user = this.services.findById(id);
       return user;
@@ -43,8 +44,8 @@ export default class UserController {
     @Body() body: UserDto
   ): Promise<IUser<UserDto & UserEntity>> {
     try {
-      const { message, user } = await this.services.create(body);
-      return { message, user };
+      const { message, user, statusCode } = await this.services.create(body);
+      return { message, statusCode, user };
     } catch (err: any) {
       logger(err);
     }
@@ -56,8 +57,18 @@ export default class UserController {
     @Body() body: UserDto
   ): Promise<IUser> {
     try {
-      const { message } = await this.services.update(id, body);
-      return { message };
+      const { message, statusCode } = await this.services.update(id, body);
+      return { message, statusCode };
+    } catch (err) {
+      logger(err);
+    }
+  }
+
+  @Delete(':id')
+  async deleteUserById(@Param('id', ParseIntPipe) id: number): Promise<IUser> {
+    try {
+      const { message, statusCode } = await this.services.delete(id);
+      return { message, statusCode };
     } catch (err) {
       logger(err);
     }

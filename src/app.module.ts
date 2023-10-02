@@ -1,22 +1,18 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import AuthEntity from './auth/auth.entity';
-
+import NoteModule from './notes/notes.module';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './db/db.module';
+import UserModule from './user/user.module';
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: null,
-      database: 'auth_nestjs',
-      entities: [AuthEntity],
-      synchronize: true,
-      timezone: '+07:00',
-    }),
+    DatabaseModule,
     AuthModule,
+    NoteModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    UserModule,
   ],
 })
 export class AppModule {}

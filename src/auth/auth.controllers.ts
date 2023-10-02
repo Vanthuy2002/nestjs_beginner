@@ -1,7 +1,6 @@
-import { Controller, Body, Post } from '@nestjs/common';
+import { Controller, Body, Post, ForbiddenException } from '@nestjs/common';
 import AuthServices from './auth.services';
-import AuthDto from './auth.dto';
-import { logger } from '@app/utils/helpers';
+import AuthDto, { IAuthResponse } from './auth.dto';
 
 @Controller('auth')
 export default class AuthController {
@@ -12,8 +11,18 @@ export default class AuthController {
     try {
       const { message, user } = await this.authServices.registerServices(body);
       return { message, user };
+    } catch (err: any) {
+      throw new ForbiddenException(err.message);
+    }
+  }
+
+  @Post('login')
+  async login(@Body() body: AuthDto): Promise<IAuthResponse<AuthDto>> {
+    try {
+      const userInfo = await this.authServices.loginServices(body);
+      return { ...userInfo };
     } catch (err) {
-      logger(err);
+      throw new ForbiddenException(err.message);
     }
   }
 }

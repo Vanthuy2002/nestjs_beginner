@@ -5,6 +5,8 @@ import { UserEntity } from './user.entity';
 import { IUser, IUserParams, UserDto } from './user.dto';
 import { plainToInstance } from 'class-transformer';
 
+const MAX_LIMIT = 5;
+
 @Injectable()
 export default class UserServices {
   constructor(
@@ -19,6 +21,8 @@ export default class UserServices {
   }: IUserParams): Promise<IUser<UserEntity[]>> {
     page = Number(page);
     limit = Number(limit);
+    limit = limit >= MAX_LIMIT ? MAX_LIMIT : limit;
+
     const [users, totalUser] = await this.repository.findAndCount({
       where: { fullname: Like(`%${search}%`) },
       take: limit,
